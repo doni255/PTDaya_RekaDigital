@@ -3,7 +3,7 @@ import { FaSearch, FaFilter, FaSync, FaPlus } from "react-icons/fa";
 
 import vectorImage from "../assets/Vector.png";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCustomers } from "../features/customerSlice";
+import { deleteCustomer, fetchCustomers } from "../features/customerSlice";
 import Modal from "../components/Modal";
 import CustomerForm from "../components/CustomerForm";
 import CustomerTable from "../components/CustomerTable";
@@ -32,6 +32,23 @@ const Customer = () => {
       customer.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [customers, searchQuery]);
+
+  // ✅ FIX: Move `useDispatch()` inside the component, and only use it once
+  const handleDelete = (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this customer?"
+    );
+    if (confirmDelete) {
+      dispatch(deleteCustomer(id))
+        .unwrap()
+        .then(() => {
+          alert("✅ Customer deleted successfully!");
+        })
+        .catch((error) => {
+          alert("❌ Failed to delete customer: " + error);
+        });
+    }
+  };
 
   return (
     <>
@@ -100,6 +117,7 @@ const Customer = () => {
             customers={filteredCustomers}
             status={status}
             error={error}
+            handleDelete={handleDelete}
           />
         </div>
 
@@ -166,7 +184,7 @@ const Customer = () => {
         onClose={() => setIsModalOpen(false)}
         title="Add New Customer"
       >
-        <CustomerForm onClose={() => setIsModalOpen(false)}/>
+        <CustomerForm onClose={() => setIsModalOpen(false)} />
       </Modal>
     </>
   );

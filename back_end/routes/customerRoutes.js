@@ -64,38 +64,24 @@ router.post("/", async (req, res) => {
   }
 });
 
-// router.post("/", async (req, res) => {
-//   try {
-//     console.log("📥 Incoming Data:", req.body); // ✅ Debugging
+// Delete
+router.delete("/:id", async (req, res) => {
+  try {
+    const customer = await Customer.findByPk(req.params.id);
 
-//     if (
-//       !req.body.name ||
-//       !req.body.email ||
-//       !req.body.phone ||
-//       !req.body.address
-//     ) {
-//       return res
-//         .status(400)
-//         .json({ message: "Missing required fields", received: req.body });
-//     }
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
 
-//     const customer = await Customer.create(req.body);
-//     res.status(201).json(customer);
-//   } catch (err) {
-//     console.error("🚨 Database Error:", err);
+    await customer.update({ deleted_at: new Date() });
 
-//     if (err.name === "SequelizeUniqueConstraintError") {
-//       return res.status(400).json({
-//         message: "Validation Error",
-//         errors: err.errors.map((e) => e.message), // Extract specific validation errors
-//       });
-//     }
-
-//     res.status(500).json({
-//       message: "Internal Server Error",
-//       error: err.message,
-//     });
-//   }
-// });
+    res.status(204).end();
+  } catch (error) {
+    console.error("🚨 Database Error:", error);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+});
 
 module.exports = router; // ✅ Ensure router is exported

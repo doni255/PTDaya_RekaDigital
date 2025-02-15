@@ -28,12 +28,26 @@ export const createCustomer = createAsyncThunk(
       return response.data;
     } catch (error) {
       // Extract only the relevant message
-      const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unknown error occurred.";
       return rejectWithValue(errorMessage);
     }
   }
 );
 
+export const deleteCustomer = createAsyncThunk(
+  "customers/deleteCustomer",
+  async (customerId, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${API_URL}/api/customers/${customerId}`);
+      return customerId; // Return ID so we can remove from state
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
 
 const customerSlice = createSlice({
   name: "customers",
@@ -65,6 +79,14 @@ const customerSlice = createSlice({
       })
       .addCase(createCustomer.rejected, (state, action) => {
         state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(deleteCustomer.fulfilled, (state, action) => {
+        state.list = state.list.filter(
+          (customer) => customer.id !== action.payload
+        );
+      })
+      .addCase(deleteCustomer.rejected, (state, action) => {
         state.error = action.payload;
       });
   },

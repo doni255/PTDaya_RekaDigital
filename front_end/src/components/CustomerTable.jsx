@@ -1,6 +1,6 @@
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 
-const CustomerTable = ({ customers, status, error }) => {
+const CustomerTable = ({ customers, status, error, handleDelete }) => {
   return (
     <table className="w-full border-collapse">
       <thead>
@@ -41,7 +41,10 @@ const CustomerTable = ({ customers, status, error }) => {
                 <button className="text-yellow-500 flex items-center">
                   <FaEdit className="mr-1" /> Edit
                 </button>
-                <button className="text-red-500 flex items-center">
+                <button
+                  className="text-red-500 flex items-center"
+                  onClick={() => handleDelete(customer.id)}
+                >
                   <FaTrash className="mr-1" /> Delete
                 </button>
               </td>
